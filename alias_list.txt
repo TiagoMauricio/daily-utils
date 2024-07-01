@@ -1,0 +1,15 @@
+# My personal aliases
+# simple set of aliases that I use a lot
+# copy and paste them in the bottom of your .bashrc file
+
+# git
+alias gs="git status"
+alias gb="git branch"
+alias gd="git diff"
+alias gp="git push origin HEAD"
+alias gc="git clone"
+alias repo_sync="git checkout main; git pull"
+alias fmt_commit="git add -A; git commit -m \"fmt\"; gp"
+
+# misc
+alias tf_fmt="terraform fmt --recursive ."

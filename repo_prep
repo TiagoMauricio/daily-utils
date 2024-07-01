@@ -1,0 +1,15 @@
+#!/bin/bash
+# THIS IS A TEMPLATE FILE TO BE POPULATED
+# ADD ANY CONFIGS THAT MIGHT MAKE SENSE
+GIT_USERNAME
+GIT_EMAIL
+#GIT_SIGN_KEY=
+
+# local configs for repos
+main(){
+    git config --local user.name $GIT_USERNAME
+    git config --local user.email $GIT_EMAIL
+    # git config --local user.signingkey $GIT_SIGN_KEY
+}
+
+main
