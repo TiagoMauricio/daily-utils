@@ -1,0 +1,60 @@
+#!/bin/bash
+GIT_DIR=~/git
+
+# COLORS
+NC='\033[0m'
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+
+# helper functions
+find_workspace_dirs() {
+    find $GIT_DIR/$1 -maxdepth 1 -type d | sed 's://:/:g' | grep -ve "^$GIT_DIR/$1$"
+}
+
+usage() {
+    printf "Usage: ws_repo_update <work_dir>\n"
+}
+
+# DISCLAMERS:
+#   - currently tested for OSX
+#   - will fail if there are changes in the repo
+main() {
+    # TODO add test functionality
+
+    local work_dir=$1
+
+    if [ -z "$work_dir" ]
+    then
+        printf "${RED}No folder name provided\n${NC}"
+        usage
+        exit 1
+    fi
+
+    if [ -d "$GIT_DIR/$work_dir" ]; then
+        printf "Updating repos in workspace: ${GREEN}${GIT_DIR}/${work_dir}\n${NC}"
+    else
+        printf "${RED}Provided workspace $work_dir does not exist in $GIT_DIR\n${NC}"
+        printf "Provide one of the workspace dirs listed bellow\n"
+        find_workspace_dirs
+        exit 2
+    fi
+
+    for repo_folder in $(find_workspace_dirs $work_dir); do
+        repo_name=$(basename $repo_folder)
+        printf "${GREEN}-----------------------\n${NC}"
+        printf "${GREEN}Updating $repo_name...${NC}\n"
+        printf "${GREEN}-----------------------${NC}\n"
+        # move into repo
+        cd $repo_folder
+        # find main branch
+        repo_main_branch=`git symbolic-ref refs/remotes/origin/HEAD --short | awk -F '/' {'print $2'}`
+        # checkout and update
+        git checkout $repo_main_branch
+        git pull
+    done
+
+    # TODO: find and list repos that failed to update
+    printf "${GREEN}All repos updated!\n${NC}"
+}
+
+main $1
