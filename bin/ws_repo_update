@@ -15,6 +15,27 @@ usage() {
     printf "Usage: ws_repo_update <work_dir>\n"
 }
 
+check_workspace_dir() {
+    if [ -d "$GIT_DIR/$work_dir" ]; then
+        if [ -d "$GIT_DIR/$work_dir/.git" ]; then
+            printf "${RED}Provided workspace $work_dir cannot be a git repository\n${NC}"
+            FAIL=3
+        fi
+    else
+        printf "${RED}Provided workspace $work_dir does not exist in $GIT_DIR\n${NC}"
+        FAIL=2
+    fi
+
+    if [ ! -z "$FAIL" ]; then
+        printf "Provide one of the workspace dirs listed bellow:\n"
+        for ws_dir in $(find_workspace_dirs); do
+            if [ ! -d "$ws_dir/.git" ]; then
+                printf "  - $(basename $ws_dir)\n";
+            fi
+        done
+        exit $FAIL
+    fi
+}
 # DISCLAMERS:
 #   - currently tested for OSX
 #   - will fail if there are changes in the repo
@@ -30,14 +51,9 @@ main() {
         exit 1
     fi
 
-    if [ -d "$GIT_DIR/$work_dir" ]; then
-        printf "Updating repos in workspace: ${GREEN}${GIT_DIR}/${work_dir}\n${NC}"
-    else
-        printf "${RED}Provided workspace $work_dir does not exist in $GIT_DIR\n${NC}"
-        printf "Provide one of the workspace dirs listed bellow\n"
-        find_workspace_dirs
-        exit 2
-    fi
+    check_workspace_dir
+
+    printf "Updating repos in workspace: ${GREEN}${GIT_DIR}/${work_dir}\n${NC}"
 
     for repo_folder in $(find_workspace_dirs $work_dir); do
         repo_name=$(basename $repo_folder)
@@ -54,7 +70,9 @@ main() {
     done
 
     # TODO: find and list repos that failed to update
-    printf "${GREEN}All repos updated!\n${NC}"
+    printf "${GREEN} ----------------------\n${NC}"
+    printf "${GREEN}|  All repos updated!  |\n${NC}"
+    printf "${GREEN} ----------------------\n${NC}"
 }
 
 main $1
