@@ -8,4 +8,3 @@ touch outputs.tf
 touch data.tf
 touch backend.tf
 touch global.tfvars
-touch remote.tfvars
