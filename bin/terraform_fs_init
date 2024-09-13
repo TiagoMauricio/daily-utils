@@ -1,0 +1,10 @@
+#!/bin/bash
+
+
+touch main.tf
+touch variables.tf
+touch providers.tf
+touch outputs.tf
+touch data.tf
+touch backend.tf
+touch global.tfvars

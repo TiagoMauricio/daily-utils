@@ -12,4 +12,5 @@ main(){
     # git config --local user.signingkey $GIT_SIGN_KEY
 }
 
-main
+#main
+echo "WORK IN PROGRESS"

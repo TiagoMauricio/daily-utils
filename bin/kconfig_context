@@ -1,0 +1,60 @@
+#!/bin/bash
+source colors
+
+list_contexts () {
+  kubectl config get-contexts
+}
+
+no_context_error () {
+  echo "Must specify context name"
+  echo "Use kconfig_context -l to list contexts"
+  available_contexts
+}
+
+use_context (){
+  OUT=$(kubectl config use-context $CONTEXT_NAME 2>&1)
+  if [ $? -ne 0 ]; then
+    printf "${RED}${OUT}\n${NC}"
+    available_contexts
+    exit 1
+  fi
+  printf "${GREEN}${OUT}\n${NC}"
+}
+
+available_contexts () {
+  echo "Available contexts are:"
+  list_contexts
+}
+
+usage () {
+  echo "Usage: kconfig_context [-l | -s context_name]"
+}
+
+if [ $# -eq 0 ]; then
+  usage
+  exit 1
+fi
+
+while getopts ":ls:" opt; do
+  case $opt in
+    l)
+      list_contexts
+      exit 0
+      ;;
+    s)
+      echo "Using context: ${OPTARG}"
+      if  [ -z ${OPTARG} ]; then
+        no_context_error
+        exit 1
+      else
+        CONTEXT_NAME=${OPTARG}
+        use_context
+        exit 0
+      fi
+      ;;
+    \?) echo "Invalid option: -$OPTARG"; exit 1;;
+  esac
+done
+
+usage
+exit 1
