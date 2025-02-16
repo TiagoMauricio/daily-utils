@@ -33,6 +33,15 @@ check_workspace_dir() {
         exit $FAIL
     fi
 }
+
+is_git_repo() {
+    local dir="$1"
+    if [ -d "$dir/.git" ]; then
+        return 0
+    fi
+    return 1
+}
+
 # DISCLAMERS:
 #   - currently tested for OSX
 #   - will fail if there are changes in the repo
@@ -58,13 +67,21 @@ main() {
         printf "${GREEN}-----------------------\n${NC}"
         printf "${GREEN}Updating $repo_name...${NC}\n"
         printf "${GREEN}-----------------------${NC}\n"
-        # move into repo
-        cd $repo_folder
-        # find main branch
-        repo_main_branch=`git symbolic-ref refs/remotes/origin/HEAD --short | awk -F '/' {'print $2'}`
-        # checkout and update
-        git checkout $repo_main_branch
-        git pull
+        if is_git_repo $repo_folder; then
+            # move into repo
+            cd $repo_folder
+            # find main branch
+            repo_main_branch=`git symbolic-ref refs/remotes/origin/HEAD --short | awk -F '/' {'print $2'}`
+            # checkout and update
+            git checkout $repo_main_branch
+            git pull
+        else
+            echo
+            echo
+            printf "${RED}$repo_name is not a git repo\n${NC}"
+            echo
+            echo
+        fi
     done
 
     # TODO: find and list repos that failed to update
